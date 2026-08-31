@@ -368,6 +368,7 @@
 
         let currentTrackIdx = 0;
         let isAudioPlaying = false;
+        let pauseTimeout = null;
 
         function playTrack(idx) {
             if (idx >= tracks.length) {
@@ -388,10 +389,22 @@
         }
 
         tracks.forEach((track, idx) => {
-            track.addEventListener('ended', () => playTrack(idx + 1));
+            track.addEventListener('ended', () => {
+                if (!isAudioPlaying) return;
+                // Add a natural 800ms pause between Part 1 and Part 2
+                pauseTimeout = setTimeout(() => {
+                    if (isAudioPlaying) {
+                        playTrack(idx + 1);
+                    }
+                }, 800);
+            });
         });
 
         function stopAllAudio() {
+            if (pauseTimeout) {
+                clearTimeout(pauseTimeout);
+                pauseTimeout = null;
+            }
             tracks.forEach(track => {
                 track.pause();
                 track.currentTime = 0;
