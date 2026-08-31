@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Section 2.2: Raising Concerns, Escalation & Practice Governance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap');
+
+        :root {
+            --ttn-navy: #0C2340;
+            --ttn-trust-blue: #005EB8;
+            --ttn-sky-cyan: #59CBE8;
+            --ttn-action-orange: #FE5000;
+            --ttn-slate: #333F48;
+            --ttn-ice-blue: #DBE2E9;
+            --ttn-success: #00BF6F;
+            --ttn-error: #D5281B;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Montserrat', sans-serif;
+            --radius-soft: 8px;
+            --radius-card: 14px;
+            --shadow-main: 0px 4px 14px rgba(12, 35, 64, 0.05);
+            --shadow-hover: 0px 6px 18px rgba(12, 35, 64, 0.08);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: var(--font-main);
+            color: var(--ttn-slate);
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: var(--font-heading);
+        }
+
+        .main-container {
+            width: 100%;
+            height: 100%;
+            background-color: #FFFFFFEE;
+            border-radius: 1rem;
+            border: 1px solid #DBE2E9;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+            background-image: url('Watermark_Background.jpeg');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .grid-card {
+            background-color: #FFFFFF;
+            border: 1.5px solid var(--ttn-ice-blue);
+            border-top: 5px solid var(--ttn-trust-blue);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-main);
+            transition: all 180ms ease-in-out;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .grid-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .grid-card.highlight {
+            border-top-color: var(--ttn-action-orange);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 175px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--ttn-ice-blue);
+            background-color: #F1F5F9;
+        }
+
+        /* Info Badge with Circle */
+        .info-circle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px;
+            background-color: #FFE5D9;
+            color: var(--ttn-action-orange);
+            font-family: var(--font-heading);
+            font-weight: 800;
+            font-size: 11px;
+            border: 1.5px solid #FE5000;
+            cursor: pointer;
+            transition: all 150ms ease-in-out;
+            box-shadow: 0 1px 3px rgba(254, 80, 0, 0.2);
+            line-height: 1;
+        }
+
+        .info-circle-btn:hover {
+            background-color: var(--ttn-action-orange);
+            color: #FFFFFF;
+            transform: scale(1.1);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(12, 35, 64, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 200ms ease-in-out;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: #FFFFFF;
+            border-radius: var(--radius-card);
+            border: 1.5px solid var(--ttn-ice-blue);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 650px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 200ms ease-in-out;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .toggle-switch {
+            width: 34px;
+            height: 18px;
+            background-color: var(--ttn-ice-blue);
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 180ms ease-in-out;
+        }
+        .toggle-switch.active {
+            background-color: var(--ttn-success);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            transition: transform 180ms ease-in-out;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.active::after {
+            transform: translateX(16px);
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-3 flex items-center justify-center box-border">
+
+    <div id="rootContainer" class="main-container p-4 sm:p-5">
+        
+        <!-- Header Utility -->
+        <div class="flex items-center justify-between mb-3.5 w-full relative z-20">
+            <span class="inline-flex items-center space-x-1.5 text-xs sm:text-sm font-bold text-[#005EB8] bg-[#DBE2E9] px-3.5 py-1.5 rounded-[4px] font-heading uppercase tracking-wider">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <span>Safeguarding Governance &bull; Escalation &amp; Practice Assurance</span>
+            </span>
+
+            <button id="audioToggleBtn" type="button" class="flex items-center space-x-2 cursor-pointer bg-white px-3.5 py-1.5 rounded-full border border-[#DBE2E9] shadow-sm hover:border-slate-300 transition-all focus:outline-none">
+                <svg id="speakerIcon" class="w-4 h-4 text-[#005EB8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                <span class="text-xs sm:text-sm font-semibold text-[#0C2340] font-heading">Dr. Lindsay Guidance</span>
+                <div id="audioSwitch" class="toggle-switch"></div>
+            </button>
+        </div>
+
+        <!-- 3-Column Full Frame Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 relative z-20 flex-1">
+            
+            <!-- Card 1: Active Duty to Intervene -->
+            <div class="grid-card">
+                <img src="escalation_intervene.jpeg" alt="Chaperone Intervening in Consultation" class="card-img">
+                <div class="p-4 sm:p-4.5 flex flex-col flex-1 justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2.5">
+                            <span class="w-6 h-6 rounded-full bg-[#DBE2E9] text-[#005EB8] font-heading font-bold text-xs flex items-center justify-center shrink-0">01</span>
+                            <h3 class="font-bold text-[#0C2340] text-sm sm:text-base font-heading leading-tight">Duty to Intervene</h3>
+                        </div>
+                        <div class="text-xs sm:text-sm text-[#333F48] leading-relaxed space-y-2">
+                            <p><strong>Active Safeguard:</strong> Chaperones must not remain passive witnesses. If a patient shows acute distress, pain, or unconsented touch occurs, the chaperone must intervene immediately.</p>
+                            <p><strong>Immediate Action:</strong> Pause the examination politely, check on the patient's well-being, and advocate for procedural adjustments or cessation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Formal Escalation & Whistleblowing (With Info ! Button) -->
+            <div class="grid-card highlight">
+                <img src="freedom_to_speak_up.jpeg" alt="Freedom to Speak Up" class="card-img">
+                <div class="p-4 sm:p-4.5 flex flex-col flex-1 justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2.5">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-6 h-6 rounded-full bg-[#FFE5D9] text-[#FE5000] font-heading font-bold text-xs flex items-center justify-center shrink-0">02</span>
+                                <h3 class="font-bold text-[#0C2340] text-sm sm:text-base font-heading leading-tight">Reporting &amp; Escalation</h3>
+                            </div>
+                            <button onclick="openEscalationModal(event)" type="button" title="View Escalation Pathways" class="info-circle-btn">!</button>
+                        </div>
+                        <div class="text-xs sm:text-sm text-[#333F48] leading-relaxed space-y-2">
+                            <p><strong>Internal Escalation:</strong> Concerns regarding clinician conduct or boundary breaches must be reported to the Practice Safeguarding Lead or Caldicott Guardian.</p>
+                            <p><strong>Whistleblowing Protection:</strong> Staff are legally protected under the Public Interest Disclosure Act and supported by Freedom to Speak Up Guardians.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Practice Register & Annual Audits -->
+            <div class="grid-card">
+                <img src="chaperone_audit_register.jpeg" alt="Chaperone Governance Audit Register" class="card-img">
+                <div class="p-4 sm:p-4.5 flex flex-col flex-1 justify-between">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2.5">
+                            <span class="w-6 h-6 rounded-full bg-[#DBE2E9] text-[#005EB8] font-heading font-bold text-xs flex items-center justify-center shrink-0">03</span>
+                            <h3 class="font-bold text-[#0C2340] text-sm sm:text-base font-heading leading-tight">Registers &amp; Annual Audits</h3>
+                        </div>
+                        <div class="text-xs sm:text-sm text-[#333F48] leading-relaxed space-y-2">
+                            <p><strong>Central Chaperone Register:</strong> Practices must maintain an up-to-date register detailing trained staff names, accredited training completion, and current DBS checks.</p>
+                            <p><strong>CQC Assurance:</strong> Conduct annual clinical audits reviewing chaperone offer compliance rates, documentation standards, and patient feedback.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Escalation Pathways Informational Modal -->
+    <div id="escalationModal" class="modal-overlay" onclick="closeEscalationModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-2.5">
+                    <span class="w-7 h-7 rounded-full bg-[#FFE5D9] text-[#FE5000] font-heading font-bold text-sm flex items-center justify-center shrink-0 border border-[#FE5000]">!</span>
+                    <div>
+                        <h2 class="font-heading font-bold text-[#0C2340] text-base sm:text-lg leading-tight">Escalation &amp; Whistleblowing Pathways</h2>
+                        <p class="text-[11px] text-slate-500 font-medium">Protecting patients, staff, and safety standards</p>
+                    </div>
+                </div>
+                <button onclick="closeEscalationModal(event)" type="button" class="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-500 hover:text-[#0C2340] flex items-center justify-center text-lg font-bold transition-colors focus:outline-none">✕</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs sm:text-sm text-[#333F48] leading-relaxed">
+                
+                <div class="bg-[#F0F7FF] p-3.5 rounded-xl border border-[#BFDBFE]">
+                    <p class="font-medium text-[#005EB8]">
+                        Staff members who raise genuine concerns regarding clinical safety, boundaries, or patient safeguarding are protected under the <strong>Public Interest Disclosure Act (PIDA) 1998</strong>.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="font-heading font-bold text-[#0C2340] text-sm mb-2 text-[#005EB8] uppercase tracking-wider">The 3-Tier Escalation Pathway</h3>
+                    <div class="space-y-2.5">
+                        
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-[#0C2340] mb-0.5 flex items-center space-x-1.5">
+                                <span class="w-2 h-2 rounded-full bg-[#005EB8]"></span>
+                                <span>Tier 1: Internal Practice Escalation</span>
+                            </h4>
+                            <p class="text-slate-600 text-xs">
+                                Report directly to the Practice Safeguarding Lead, Caldicott Guardian, or Practice Manager immediately following the consultation. Record factual contemporaneous notes.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-[#0C2340] mb-0.5 flex items-center space-x-1.5">
+                                <span class="w-2 h-2 rounded-full bg-[#FE5000]"></span>
+                                <span>Tier 2: Freedom to Speak Up Guardian (FTSUG)</span>
+                            </h4>
+                            <p class="text-slate-600 text-xs">
+                                If you feel unable to raise the concern within the practice, contact the local Integrated Care Board (ICB) Freedom to Speak Up Guardian for confidential, independent advice and escalation.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-[#0C2340] mb-0.5 flex items-center space-x-1.5">
+                                <span class="w-2 h-2 rounded-full bg-[#00BF6F]"></span>
+                                <span>Tier 3: External Regulators</span>
+                            </h4>
+                            <p class="text-slate-600 text-xs">
+                                Contact the Care Quality Commission (CQC), General Medical Council (GMC), or Nursing and Midwifery Council (NMC) if internal routes fail to resolve urgent patient safety risks.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-3 sm:p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+                <button onclick="closeEscalationModal(event)" type="button" class="px-4 py-1.5 bg-[#005EB8] hover:bg-[#004A91] text-white text-xs sm:text-sm font-heading font-bold rounded-lg transition-colors focus:outline-none shadow-sm">
+                    Close Guide
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="audioPart1" src="L3_Sec5_Escalation_Part1.wav" preload="auto"></audio>
+    <audio id="audioPart2" src="L3_Sec5_Escalation_Part2.wav" preload="auto"></audio>
+
+    <script>
+        function openEscalationModal(event) {
+            if (event) event.stopPropagation();
+            document.getElementById('escalationModal').classList.add('active');
+        }
+
+        function closeEscalationModal(event) {
+            if (event) event.stopPropagation();
+            document.getElementById('escalationModal').classList.remove('active');
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeEscalationModal();
+        });
+
+        const audioToggleBtn = document.getElementById('audioToggleBtn');
+        const audioSwitch = document.getElementById('audioSwitch');
+        const speakerIcon = document.getElementById('speakerIcon');
+
+        const tracks = [
+            document.getElementById('audioPart1'),
+            document.getElementById('audioPart2')
+        ];
+
+        let currentTrackIdx = 0;
+        let isAudioPlaying = false;
+
+        function playTrack(idx) {
+            if (idx >= tracks.length) {
+                stopAllAudio();
+                return;
+            }
+            currentTrackIdx = idx;
+            const currentAudio = tracks[currentTrackIdx];
+            currentAudio.currentTime = 0;
+            currentAudio.play().then(() => {
+                isAudioPlaying = true;
+                audioSwitch.classList.add('active');
+                speakerIcon.classList.add('text-[#00BF6F]');
+                speakerIcon.classList.remove('text-[#005EB8]');
+            }).catch(err => {
+                stopAllAudio();
+            });
+        }
+
+        tracks.forEach((track, idx) => {
+            track.addEventListener('ended', () => playTrack(idx + 1));
+        });
+
+        function stopAllAudio() {
+            tracks.forEach(track => {
+                track.pause();
+                track.currentTime = 0;
+            });
+            currentTrackIdx = 0;
+            isAudioPlaying = false;
+            audioSwitch.classList.remove('active');
+            speakerIcon.classList.remove('text-[#00BF6F]');
+            speakerIcon.classList.add('text-[#005EB8]');
+        }
+
+        audioToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isAudioPlaying ? stopAllAudio() : playTrack(0);
+        });
+    </script>
+</body>
+</html>
